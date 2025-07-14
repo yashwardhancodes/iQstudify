@@ -2,12 +2,13 @@
   "name": "examquestion",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
+"scripts": {
+  "dev": "next dev -H 0.0.0.0 -p 3000",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint"
+},
+
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
