@@ -1,15 +1,11 @@
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
-
-const ResetPasswordClient = dynamic(() => import("../../components/ResetPasswordComponent"), {
-  ssr: false, // disable SSR
-});
+import ResetPasswordClient from '../../components/ResetPasswordComponent';
 
 export const dynamic = "force-dynamic"; // disables static generation
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading Reset Page...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <ResetPasswordClient />
     </Suspense>
   );
