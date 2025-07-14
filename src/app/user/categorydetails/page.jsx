@@ -1,3 +1,4 @@
+
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -6,17 +7,22 @@ import Sidebar from "../Sidebar/page";
 import Link from "next/link";
 import { FaBars, FaClock, FaListOl, FaTimes, FaTrophy } from "react-icons/fa";
 import { Raleway } from 'next/font/google';
-import { MdOutlinePlayArrow } from 'react-icons/md';
+import { MdOutlinePlayArrow } from 'react-icons/md'
 
 const raleway = Raleway({
     subsets: ['latin'],
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700'], // You can include other weights if needed
     variable: '--font-raleway',
 });
 
 export default function CategoryDetailsPage() {
+
     const searchParams = useSearchParams();
     const categoryId = searchParams.get("id");
+    // useEffect(() => {
+    //     console.log("Router param id:", id);
+    // }, [id]);
+    console.log("categoryIdFromParams", categoryId);
 
     const [titleCategories, setTitleCategories] = useState([]);
     const [categoriesByTitle, setCategoriesByTitle] = useState({});
@@ -26,27 +32,28 @@ export default function CategoryDetailsPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [loadingSubcategories, setLoadingSubcategories] = useState(false);
 
+
     useEffect(() => {
-        const fetchAllTitleCategories = async () => {
-            try {
-                const token = typeof window !== "undefined" ? localStorage.getItem("operatorToken") : null;
-
-                const response = await axios.get("/api/admin/getalltitlecategory", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                setTitleCategories(response.data);
-                await fetchAllCategories(response.data);
-            } catch (err) {
-                console.error("Title category error:", err);
-            }
-        };
-
         fetchAllTitleCategories();
     }, []);
 
+    const fetchAllTitleCategories = async () => {
+        const token = localStorage.getItem("operatorToken");
+        try {
+            const response = await axios.get("/api/admin/getalltitlecategory", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setTitleCategories(response.data);
+            await fetchAllCategories(response.data);
+        } catch (err) {
+            console.error("Title category error:", err);
+        }
+    };
+
     const fetchAllCategories = async (titleCategories) => {
         const categoryData = {};
+        // setLoadingSubcategories(true);
 
         try {
             await Promise.all(
@@ -74,6 +81,7 @@ export default function CategoryDetailsPage() {
                 })
             );
 
+            console.log("✅ Grouped categories by titleId:", categoryData);
             setCategoriesByTitle(categoryData);
         } catch (error) {
             console.error("Error in fetchAllCategories:", error);
@@ -90,6 +98,8 @@ export default function CategoryDetailsPage() {
             const fetched = res.data?.subcategories || [];
 
             setSubcategories(fetched);
+
+            // ⬇ Store subcategory count for this category
             setSubcategoryCounts((prev) => ({
                 ...prev,
                 [category._id]: fetched.length,
@@ -97,12 +107,13 @@ export default function CategoryDetailsPage() {
         } catch (err) {
             console.error("Subcategory fetch error:", err);
             setSubcategories([]);
+
             setSubcategoryCounts((prev) => ({
                 ...prev,
                 [category._id]: 0,
             }));
         } finally {
-            setLoadingSubcategories(false);
+            setLoadingSubcategories(false); // 👈 THIS IS REQUIRED!
         }
     };
 
@@ -126,8 +137,9 @@ export default function CategoryDetailsPage() {
         }
     }, [categoryId, categoriesByTitle, titleCategories]);
 
+
     return (
-        <div className={`${raleway.className} flex bg-gray-100`}>
+        <div className={` ${raleway.className} flex bg-gray-100 `}>
             {/* Hamburger / Close for mobile */}
             <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -140,7 +152,10 @@ export default function CategoryDetailsPage() {
                 )}
             </button>
 
+
+
             {/* Sidebar */}
+
             <Sidebar
                 titleCategories={titleCategories}
                 categoriesByTitle={categoriesByTitle}
@@ -149,16 +164,14 @@ export default function CategoryDetailsPage() {
                 subcategoryCounts={subcategoryCounts}
                 sidebarOpen={sidebarOpen}
                 setSidebarOpen={setSidebarOpen}
-            />
 
+            />
             {/* Right Section */}
-            <main className="flex-1 p-6 sm:ml-72 min-h-screen overflow-y-auto">
-                <h1 className="text-3xl font-bold mb-2 text-gray-800 mt-20">All MCQ&apos;S</h1>
+            <main className="flex-1 p-6 sm:ml-72  min-h-screen overflow-y-auto">
+                <h1 className="text-3xl font-bold mb-2 text-gray-800  mt-20">All MCQ'S</h1>
 
                 {selected.title && (
-                    <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-                        {selected.title.title}
-                    </h2>
+                    <h2 className="text-2xl font-semibold text-gray-700 mb-6">{selected.title.title}</h2>
                 )}
 
                 {/* Subcategories Grid */}
@@ -195,7 +208,9 @@ export default function CategoryDetailsPage() {
                         No subcategories found.
                     </div>
                 )}
+
             </main>
         </div>
     );
 }
+
